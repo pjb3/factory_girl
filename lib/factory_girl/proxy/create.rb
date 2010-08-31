@@ -3,7 +3,11 @@ module FactoryGirl
     class Create < Build #:nodoc:
       def result
         run_callbacks(:after_build)
-        @instance.save!
+        if @instance.respond_to?(:save!)
+          @instance.save!
+        else
+          @instance.save or raise RuntimeError.new("Could not save #{@instance.inspect}")
+        end
         run_callbacks(:after_create)
         @instance
       end
